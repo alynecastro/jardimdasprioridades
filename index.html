@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equilibria: Jardim das Prioridades</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        .font-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .guardian-organus-svg { /* Estilo para o SVG do Organus */
+            width: 100px;
+            height: 100px;
+            fill: currentColor; 
+        }
+        .garden-bg {
+            background: linear-gradient(to bottom, #D1FAE5, #A7F3D0, #6EE7B7); /* Tons de verde para o jardim */
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Grid para plantas e ervas */
+            gap: 10px;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 250px; /* Altura mínima para o jardim */
+        }
+        .plant, .weed {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem; /* Tamanho do emoji */
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .plant:hover, .weed:hover {
+            transform: scale(1.1);
+        }
+        .plant {
+            background-color: #FEF9C3; /* Amarelo claro para plantas */
+            border: 2px solid #FDE047; /* Amarelo mais escuro */
+        }
+        .plant.watered {
+            background-color: #A7F3D0; /* Verde claro quando regada */
+            border-color: #34D399; /* Verde mais escuro */
+            opacity: 0.7;
+        }
+        .weed {
+            background-color: #FECACA; /* Vermelho claro para ervas */
+            border: 2px solid #F87171; /* Vermelho mais escuro */
+        }
+        .weed.removed {
+            opacity: 0;
+            transform: scale(0.5);
+            pointer-events: none;
+        }
+        .hidden-section {
+            display: none;
+        }
+        .fade-in {
+            animation: fadeInAnimation 1s ease-in forwards;
+        }
+        @keyframes fadeInAnimation {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .custom-button {
+            background-color: #059669; /* Verde escuro para botões */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .custom-button:hover {
+            background-color: #047857;
+            transform: translateY(-2px);
+        }
+        .custom-button:active {
+            transform: translateY(0px);
+        }
+        .gemini-button {
+            background-color: #D97706; /* Laranja para o botão Gemini do Organus */
+        }
+        .gemini-button:hover {
+            background-color: #B45309;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #D97706; /* Laranja para o spinner */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .tip-container {
+            background-color: #FFFBEB; /* Amarelo muito claro */
+            border: 1px solid #FDE68A; /* Amarelo claro */
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            text-align: left;
+            font-style: italic;
+            color: #7C2D12; /* Castanho escuro */
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-yellow-100 to-green-200 text-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="w-full max-w-2xl mx-auto bg-white/80 backdrop-blur-md shadow-2xl rounded-xl p-6 md:p-10">
+
+        <section id="start-screen-garden" class="text-center space-y-6 fade-in">
+            <h1 class="text-4xl md:text-5xl font-title text-yellow-600">Equilibria</h1>
+            <h2 class="text-2xl md:text-3xl font-semibold text-yellow-500">O Jardim das Prioridades</h2>
+            
+            <div class="flex justify-center my-4">
+                <svg class="guardian-organus-svg text-yellow-500" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M17 2H7C5.89543 2 5 2.89543 5 4V20C5 21.1046 5.89543 22 7 22H17C18.1046 22 19 21.1046 19 20V4C19 2.89543 18.1046 2 17 2ZM7 4V7H17V4H7ZM7 9V12H12V9H7ZM14 9V12H17V9H14ZM7 14V17H12V14H7ZM14 14V17H17V14H14ZM7 19V20H17V19H7Z"/>
+                </svg>
+            </div>
+            <p class="text-lg text-gray-700">Saudações, organizador(a) em potencial! Eu sou <strong class="text-yellow-600">Organus</strong>, o Guardião do Jardim das Prioridades.</p>
+            <p class="text-md text-gray-600">Este jardim reflete os seus objetivos e responsabilidades. Algumas ervas daninhas (distrações) surgiram e algumas plantas valiosas precisam da sua atenção.</p>
+            <p class="text-md text-gray-600">Ajude-me a restaurar a ordem. Remova <strong id="total-weeds-info">3</strong> ervas daninhas (🌿) e regue <strong id="total-plants-info">4</strong> plantas importantes (🌸).</p>
+            <button id="start-button-garden" class="custom-button">Começar a Organizar</button>
+        </section>
+
+        <section id="game-screen-garden" class="hidden-section text-center space-y-6">
+            <p id="organus-message" class="text-lg text-yellow-700 font-semibold">Clique nas ervas daninhas para remover e nas flores para regar.</p>
+            <div id="garden-area" class="garden-bg">
+                </div>
+            <p class="text-md text-gray-600">
+                Ervas Removidas: <span id="weeds-removed-count" class="font-bold text-yellow-600">0</span>/<span id="total-weeds-game">3</span> | 
+                Plantas Regadas: <span id="plants-watered-count" class="font-bold text-yellow-600">0</span>/<span id="total-plants-game">4</span>
+            </p>
+            <button id="exit-early-button-garden" class="custom-button bg-red-500 hover:bg-red-600">Desistir da Tarefa</button>
+        </section>
+
+        <section id="end-screen-garden" class="hidden-section text-center space-y-6">
+            <h2 id="end-title-garden" class="text-3xl md:text-4xl font-semibold text-yellow-600">Jardim em Ordem!</h2>
+             <div class="flex justify-center my-4">
+                <svg class="guardian-organus-svg text-yellow-500" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                     <path fill-rule="evenodd" clip-rule="evenodd" d="M17 2H7C5.89543 2 5 2.89543 5 4V20C5 21.1046 5.89543 22 7 22H17C18.1046 22 19 21.1046 19 20V4C19 2.89543 18.1046 2 17 2ZM17 7H7V4H17V7ZM12 9H7V12H12V9ZM14 9H17V12H14V9ZM12 14H7V17H12V14ZM14 14H17V17H14V14ZM7 20V19H17V20H7Z M9 10.5L10.5 12L9 13.5L7.5 12L9 10.5ZM15 10.5L16.5 12L15 13.5L13.5 12L15 10.5ZM9 15.5L10.5 17L9 18.5L7.5 17L9 15.5Z"/>
+                </svg>
+            </div>
+            <p id="end-message-garden" class="text-lg text-gray-700">Excelente trabalho! O jardim está mais organizado e as prioridades estão claras.</p>
+            <p class="text-md text-gray-600">Lembre-se, a organização é a chave para um crescimento saudável dos seus projetos.</p>
+            <div class="space-x-4 mt-4">
+                <button id="restart-button-garden" class="custom-button">Organizar Novamente</button>
+                <button id="gemini-tip-button-garden" class="custom-button gemini-button">✨ Dica de Organus</button>
+            </div>
+            <div id="gemini-tip-loading-garden" class="loading-spinner hidden-section mt-4"></div>
+            <div id="gemini-tip-container-garden" class="tip-container hidden-section">
+                <p id="gemini-tip-text-garden"></p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Elementos da UI do Jardim
+        const startScreenGarden = document.getElementById('start-screen-garden');
+        const gameScreenGarden = document.getElementById('game-screen-garden');
+        const endScreenGarden = document.getElementById('end-screen-garden');
+
+        const startButtonGarden = document.getElementById('start-button-garden');
+        const exitEarlyButtonGarden = document.getElementById('exit-early-button-garden');
+        const restartButtonGarden = document.getElementById('restart-button-garden');
+        const geminiTipButtonGarden = document.getElementById('gemini-tip-button-garden');
+
+        const gardenArea = document.getElementById('garden-area');
+        const organusMessage = document.getElementById('organus-message');
+        const weedsRemovedCountDisplay = document.getElementById('weeds-removed-count');
+        const plantsWateredCountDisplay = document.getElementById('plants-watered-count');
+        
+        const totalWeedsInfo = document.getElementById('total-weeds-info');
+        const totalPlantsInfo = document.getElementById('total-plants-info');
+        const totalWeedsGame = document.getElementById('total-weeds-game');
+        const totalPlantsGame = document.getElementById('total-plants-game');
+
+        const endTitleGarden = document.getElementById('end-title-garden');
+        const endMessageGarden = document.getElementById('end-message-garden');
+
+        const geminiTipContainerGarden = document.getElementById('gemini-tip-container-garden');
+        const geminiTipTextGarden = document.getElementById('gemini-tip-text-garden');
+        const geminiTipLoadingGarden = document.getElementById('gemini-tip-loading-garden');
+
+        // Configurações do Jogo do Jardim
+        const TOTAL_WEEDS = 3;
+        const TOTAL_PLANTS = 4;
+        const GARDEN_ITEMS = 10; // Total de espaços no jardim
+
+        let weedsRemoved = 0;
+        let plantsWatered = 0;
+        let isGardenGameRunning = false;
+
+        // Inicializa a informação de totais
+        totalWeedsInfo.textContent = TOTAL_WEEDS;
+        totalPlantsInfo.textContent = TOTAL_PLANTS;
+        totalWeedsGame.textContent = TOTAL_WEEDS;
+        totalPlantsGame.textContent = TOTAL_PLANTS;
+
+        // Função para mostrar uma secção e esconder as outras
+        function showGardenSection(sectionToShow, fadeIn = true) {
+            [startScreenGarden, gameScreenGarden, endScreenGarden, geminiTipContainerGarden, geminiTipLoadingGarden].forEach(section => {
+                if (section.id === sectionToShow.id) {
+                    section.classList.remove('hidden-section');
+                    if (fadeIn) section.classList.add('fade-in');
+                } else {
+                    section.classList.add('hidden-section');
+                    if (fadeIn) section.classList.remove('fade-in');
+                }
+            });
+        }
+        
+        // Função para popular o jardim
+        function populateGarden() {
+            gardenArea.innerHTML = ''; // Limpa o jardim
+            let items = [];
+            for (let i = 0; i < TOTAL_PLANTS; i++) items.push({ type: 'plant', emoji: '🌸', id: `plant-${i}` });
+            for (let i = 0; i < TOTAL_WEEDS; i++) items.push({ type: 'weed', emoji: '🌿', id: `weed-${i}` });
+            
+            // Adiciona itens vazios se necessário para preencher o GARDEN_ITEMS
+            while (items.length < GARDEN_ITEMS) {
+                items.push({ type: 'empty', emoji: '', id: `empty-${items.length}`});
+            }
+
+            // Baralha os itens
+            items.sort(() => Math.random() - 0.5);
+
+            items.forEach(itemData => {
+                if (itemData.type === 'empty') return; // Não cria div para itens vazios
+
+                const itemElement = document.createElement('div');
+                itemElement.classList.add(itemData.type); // 'plant' ou 'weed'
+                itemElement.textContent = itemData.emoji;
+                itemElement.dataset.id = itemData.id;
+                itemElement.dataset.type = itemData.type;
+                itemElement.addEventListener('click', handleGardenItemClick);
+                gardenArea.appendChild(itemElement);
+            });
+        }
+
+        // Função para lidar com cliques nos itens do jardim
+        function handleGardenItemClick(event) {
+            if (!isGardenGameRunning) return;
+
+            const item = event.target;
+            const type = item.dataset.type;
+
+            if (type === 'weed' && !item.classList.contains('removed')) {
+                item.classList.add('removed');
+                weedsRemoved++;
+                updateGardenCounts();
+                organusMessage.textContent = "Boa! Menos uma distração.";
+            } else if (type === 'plant' && !item.classList.contains('watered')) {
+                item.classList.add('watered');
+                plantsWatered++;
+                updateGardenCounts();
+                organusMessage.textContent = "Excelente! Esta prioridade está a ser cuidada.";
+            }
+            checkGardenWinCondition();
+        }
+        
+        // Função para atualizar as contagens
+        function updateGardenCounts() {
+            weedsRemovedCountDisplay.textContent = weedsRemoved;
+            plantsWateredCountDisplay.textContent = plantsWatered;
+        }
+
+        // Função para verificar condição de vitória
+        function checkGardenWinCondition() {
+            if (weedsRemoved >= TOTAL_WEEDS && plantsWatered >= TOTAL_PLANTS) {
+                endGardenExercise(true);
+            }
+        }
+
+        // Função para iniciar o exercício do jardim
+        function startGardenExercise() {
+            isGardenGameRunning = true;
+            weedsRemoved = 0;
+            plantsWatered = 0;
+            updateGardenCounts();
+            populateGarden();
+            showGardenSection(gameScreenGarden);
+            organusMessage.textContent = "Clique nas ervas daninhas para remover e nas flores para regar.";
+            geminiTipContainerGarden.classList.add('hidden-section');
+            geminiTipTextGarden.textContent = '';
+        }
+
+        // Função para finalizar o exercício do jardim
+        function endGardenExercise(completed) {
+            isGardenGameRunning = false;
+            showGardenSection(endScreenGarden);
+
+            if (completed) {
+                endTitleGarden.textContent = "Jardim em Ordem!";
+                endMessageGarden.textContent = "Excelente trabalho! O jardim está mais organizado e as prioridades estão claras.";
+            } else {
+                endTitleGarden.textContent = "Organização Incompleta";
+                endMessageGarden.textContent = "Ainda há trabalho a fazer no jardim. Volte quando estiver pronto para organizar!";
+            }
+        }
+        
+        // Função para buscar dica de organização da API Gemini
+        async function fetchOrganizationTip() {
+            geminiTipLoadingGarden.classList.remove('hidden-section');
+            geminiTipContainerGarden.classList.add('hidden-section');
+            geminiTipTextGarden.textContent = '';
+            geminiTipButtonGarden.disabled = true;
+
+            const prompt = "Gere uma curta dica de organização ou priorização (máximo 2 frases) para um jogo chamado Equilibria. A dica deve ser prática e motivadora, como se viesse de um sábio guardião de um jardim chamado Organus. Use uma linguagem clara e encorajadora. Não inclua saudações ou despedidas, apenas a dica em si.";
+            
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Deixar vazio, será fornecido pelo ambiente
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Erro da API Gemini (Organus):", errorData);
+                    throw new Error(`Erro da API: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    geminiTipTextGarden.textContent = `Organus aconselha: "${text}"`;
+                } else {
+                    console.error("Resposta inesperada da API Gemini (Organus):", result);
+                    geminiTipTextGarden.textContent = "Organus está a planear cuidadosamente... Tente novamente mais tarde.";
+                }
+            } catch (error) {
+                console.error('Erro ao buscar dica da API Gemini (Organus):', error);
+                geminiTipTextGarden.textContent = "Ocorreu um pequeno desarranjo no jardim. Por favor, tente novamente para receber a sabedoria de Organus.";
+            } finally {
+                geminiTipLoadingGarden.classList.add('hidden-section');
+                geminiTipContainerGarden.classList.remove('hidden-section');
+                geminiTipButtonGarden.disabled = false;
+            }
+        }
+
+        // Event Listeners do Jardim
+        startButtonGarden.addEventListener('click', startGardenExercise);
+        
+        exitEarlyButtonGarden.addEventListener('click', () => {
+            if (isGardenGameRunning) {
+                endGardenExercise(false);
+            }
+        });
+
+        restartButtonGarden.addEventListener('click', () => {
+            showGardenSection(startScreenGarden);
+            geminiTipContainerGarden.classList.add('hidden-section');
+            geminiTipTextGarden.textContent = '';
+        });
+
+        geminiTipButtonGarden.addEventListener('click', fetchOrganizationTip);
+
+        // Mostrar ecrã inicial ao carregar
+        showGardenSection(startScreenGarden);
+
+    </script>
+</body>
+</html>
